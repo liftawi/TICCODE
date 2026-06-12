@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TIKCODE - بوابتك نحو العالم الرقمي</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <script>
+        tailwind.config={theme:{extend:{colors:{accent:'#00e5a0','accent-dark':'#00c488',dark:{950:'#04040a',900:'#06060e',800:'#0c0c1d',700:'#12122a',600:'#1a1a3e',500:'#242450'}},fontFamily:{taj:['Tajawal','sans-serif']}}}}
+    </script>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        html{scroll-behavior:smooth}
+        body{font-family:'Tajawal',sans-serif;background:#06060e;color:#e2e8f0;overflow-x:hidden;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+        body,p,span,div,li,a,button,input,textarea,label{line-height:2;letter-spacing:0.03em;word-spacing:0.08em}
+        h1{line-height:1.3;letter-spacing:0}h2,h3,h4{line-height:1.5;letter-spacing:0.01em}
+        ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:#0c0c1d}::-webkit-scrollbar-thumb{background:#00e5a0;border-radius:3px}
+        #cursorGlow{position:fixed;width:250px;height:250px;border-radius:50%;background:radial-gradient(circle,rgba(0,229,160,0.28) 0%,rgba(0,229,160,0.1) 40%,transparent 70%);pointer-events:none;z-index:0;transform:translate(-50%,-50%);transition:opacity .15s ease}
+        .page-section{display:none;opacity:0;transition:opacity .35s ease}.page-section.active{display:block;animation:fadeIn .4s ease forwards}
+        @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+        .gradient-text{background:linear-gradient(135deg,#00e5a0,#00b8d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+        .glow-border{border:1px solid rgba(0,229,160,0.15);box-shadow:0 0 20px rgba(0,229,160,0.04)}
+        .card-hover{transition:all .3s ease}.card-hover:hover{transform:translateY(-5px);box-shadow:0 12px 40px rgba(0,229,160,0.1);border-color:rgba(0,229,160,0.35)}
+        .btn-primary{background:linear-gradient(135deg,#00e5a0,#00c488);color:#06060e;font-weight:700;transition:all .3s ease;cursor:pointer;font-family:'Tajawal',sans-serif;border:none;line-height:1.5}.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,229,160,0.3)}.btn-primary:active{transform:translateY(0)}.btn-primary:disabled{opacity:.5;cursor:not-allowed;transform:none!important;box-shadow:none!important}
+        .btn-outline{border:1px solid rgba(0,229,160,0.4);color:#00e5a0;transition:all .3s ease;cursor:pointer;background:transparent;font-family:'Tajawal',sans-serif;line-height:1.5}.btn-outline:hover{background:rgba(0,229,160,0.1);border-color:#00e5a0}
+        .input-field{background:rgba(12,12,29,0.8);border:1px solid rgba(255,255,255,0.08);color:#e2e8f0;transition:all .3s ease;font-family:'Tajawal',sans-serif;line-height:1.8}.input-field:focus{outline:none;border-color:#00e5a0;box-shadow:0 0 0 3px rgba(0,229,160,0.1)}.input-field::placeholder{color:#4a5568}
+        .nav-link{position:relative;transition:color .3s ease;cursor:pointer;text-decoration:none}.nav-link::after{content:'';position:absolute;bottom:-4px;right:0;width:0;height:2px;background:#00e5a0;transition:width .3s ease}.nav-link:hover::after,.nav-link.active-link::after{width:100%}.nav-link:hover,.nav-link.active-link{color:#00e5a0}
+        .fade-up{opacity:0;transform:translateY(30px);transition:all .6s ease}.fade-up.visible{opacity:1;transform:translateY(0)}
+        .hero-canvas{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0}
+        .toast-container{position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+        .toast{padding:14px 24px;border-radius:12px;font-weight:600;font-size:14px;pointer-events:auto;animation:toastIn .4s ease,toastOut .4s ease 3s forwards;backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.1);max-width:420px;text-align:center;line-height:1.8}
+        .toast-success{background:rgba(0,229,160,0.15);color:#00e5a0;border-color:rgba(0,229,160,0.3)}.toast-error{background:rgba(239,68,68,0.15);color:#f87171;border-color:rgba(239,68,68,0.3)}.toast-info{background:rgba(0,184,212,0.15);color:#00b8d4;border-color:rgba(0,184,212,0.3)}
+        @keyframes toastIn{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}@keyframes toastOut{from{opacity:1}to{opacity:0;transform:translateY(-20px)}}
+        .mobile-menu{transform:translateX(100%);transition:transform .3s ease;pointer-events:none}.mobile-menu.open{transform:translateX(0);pointer-events:auto}
+        .contact-tab{cursor:pointer;padding:10px 24px;border-radius:12px;font-weight:700;transition:all .3s ease;border:1px solid rgba(255,255,255,0.08);color:#94a3b8}
+        .contact-tab.active-tab{background:rgba(0,229,160,0.1);border-color:rgba(0,229,160,0.3);color:#00e5a0}
+        .contact-tab:hover:not(.active-tab){border-color:rgba(255,255,255,0.15);color:#e2e8f0}
+        .faq-item{border:1px solid rgba(255,255,255,0.06);border-radius:16px;overflow:hidden;transition:all .3s ease;background:rgba(18,18,42,0.4)}
+        .faq-item.open{border-color:rgba(0,229,160,0.2);background:rgba(18,18,42,0.6)}
+        .faq-answer{max-height:0;overflow:hidden;transition:max-height .4s ease}.faq-item.open .faq-answer{max-height:300px}
+        .faq-answer-inner{padding:0 24px 20px}
+        .faq-icon{transition:transform .3s ease}.faq-item.open .faq-icon{transform:rotate(45deg)}
+        .guarantee-badge{animation:pulse-glow 2s ease-in-out infinite}
+        @keyframes pulse-glow{0%,100%{box-shadow:0 0 20px rgba(0,229,160,0.15)}50%{box-shadow:0 0 40px rgba(0,229,160,0.3)}}
+        @media(prefers-reduced-motion:reduce){*{animation-duration:0.01ms!important;transition-duration:0.01ms!important}}
+    </style>
+</head>
+<body>
+
+<div id="cursorGlow"></div>
+<div id="toastContainer" class="toast-container"></div>
+
+<!-- شريط التنقل -->
+<nav id="navbar" class="fixed top-0 right-0 left-0 z-50 transition-all duration-300" style="background:rgba(6,6,14,0.85);backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,0.04)">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6">
+        <div class="flex items-center justify-between h-16 sm:h-20">
+            <div class="flex items-center gap-2 cursor-pointer" onclick="navigate('home')">
+                <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-accent to-cyan-400 flex items-center justify-center"><i class="fas fa-code text-dark-900 text-sm font-black"></i></div>
+                <span class="text-xl font-black tracking-tight">TIK<span class="gradient-text">CODE</span></span>
+            </div>
+            <div class="hidden lg:flex items-center gap-7">
+                <span class="nav-link text-sm font-semibold text-gray-300" data-route="home" onclick="navigate('home')">الرئيسية</span>
+                <span class="nav-link text-sm font-semibold text-gray-300" data-route="services" onclick="navigate('services')">خدماتنا</span>
+                <span class="nav-link text-sm font-semibold text-gray-300" data-route="faq" onclick="navigate('faq')">أسئلة شائعة</span>
+                <span class="nav-link text-sm font-semibold text-gray-300" data-route="contact" onclick="navigate('contact')">تواصل معنا</span>
+            </div>
+            <button id="mobBtn" class="lg:hidden text-gray-300 hover:text-accent p-2 cursor-pointer"><i class="fas fa-bars text-xl"></i></button>
+        </div>
+    </div>
+</nav>
+
+<!-- القائمة الجوالة -->
+<div id="mobMenu" class="mobile-menu fixed top-0 left-0 right-0 bottom-0 z-[60] bg-dark-900" style="backdrop-filter:blur(20px)">
+    <div class="flex items-center justify-between p-4 border-b border-white/5"><span class="text-xl font-black">TIK<span class="gradient-text">CODE</span></span><button id="mobClose" class="text-gray-300 hover:text-white p-2 cursor-pointer"><i class="fas fa-times text-xl"></i></button></div>
+    <div class="p-6 space-y-1">
+        <div class="block py-3 px-4 rounded-xl text-gray-300 hover:text-accent hover:bg-accent/5 font-semibold cursor-pointer" onclick="navigate('home');closeMob()">الرئيسية</div>
+        <div class="block py-3 px-4 rounded-xl text-gray-300 hover:text-accent hover:bg-accent/5 font-semibold cursor-pointer" onclick="navigate('services');closeMob()">خدماتنا</div>
+        <div class="block py-3 px-4 rounded-xl text-gray-300 hover:text-accent hover:bg-accent/5 font-semibold cursor-pointer" onclick="navigate('faq');closeMob()">أسئلة شائعة</div>
+        <div class="block py-3 px-4 rounded-xl text-gray-300 hover:text-accent hover:bg-accent/5 font-semibold cursor-pointer" onclick="navigate('contact');closeMob()">تواصل معنا</div>
+    </div>
+</div>
+
+<!-- ============ الرئيسية ============ -->
+<section id="page-home" class="page-section">
+    <!-- الهيرو -->
+    <div class="relative min-h-screen flex items-center overflow-hidden">
+        <canvas id="heroCanvas" class="hero-canvas"></canvas>
+        <div class="absolute inset-0 bg-gradient-to-b from-transparent via-dark-900/50 to-dark-900 z-[1]"></div>
+        <div class="relative z-[2] max-w-7xl mx-auto px-4 sm:px-6 pt-24 pb-16 text-center">
+            <h1 class="text-4xl sm:text-5xl md:text-7xl font-black mb-6 fade-up">بوابتك نحو<br><span class="gradient-text">العالم الرقمي</span></h1>
+            <p class="text-gray-400 text-lg sm:text-xl max-w-2xl mx-auto mb-10 fade-up">نحوّل أفكارك إلى واقع رقمي مذهل. نصمم ونطوّر مواقع وتطبيقات ويب عالية الأداء تُحقق أهدافك التجارية</p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center fade-up">
+                <button onclick="navigate('contact')" class="btn-primary px-8 py-4 rounded-2xl text-base sm:text-lg"><i class="fas fa-rocket ml-2"></i>ابدأ مشروعك</button>
+                <button onclick="document.getElementById('homeServices').scrollIntoView({behavior:'smooth'})" class="btn-outline px-8 py-4 rounded-2xl text-base sm:text-lg"><i class="fas fa-arrow-left ml-2"></i>عرض الخدمات</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ضمان 14 يوم -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-16">
+        <div class="relative rounded-3xl overflow-hidden p-8 sm:p-12 text-center guarantee-badge fade-up" style="background:linear-gradient(135deg,rgba(0,229,160,0.1),rgba(0,184,212,0.06));border:1px solid rgba(0,229,160,0.25)">
+            <div class="flex flex-col items-center gap-4">
+                <div class="w-20 h-20 rounded-full bg-accent/15 flex items-center justify-center">
+                    <i class="fas fa-shield-alt text-accent text-3xl"></i>
+                </div>
+                <h2 class="text-2xl sm:text-4xl font-black">ضمان استرجاع الأموال <span class="gradient-text">لمدة 14 يوم</span></h2>
+                <p class="text-gray-400 max-w-xl mx-auto text-lg">نحن واثقون من جودة عملنا. إذا لم يعجبك الموقع خلال 14 يوماً من التسليم، نسترد لك مبلغك كاملاً بدون أي شروط.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- من نحن -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-20">
+        <div class="text-center mb-14 fade-up"><span class="text-accent font-bold text-sm tracking-wider">من نحن</span><h2 class="text-3xl sm:text-5xl font-black mt-3 mb-4">نحن <span class="gradient-text">TIKCODE</span></h2><p class="text-gray-400 max-w-2xl mx-auto text-lg">وكالة تطوير ويب متخصصة في بناء حلول رقمية احترافية تجمع بين الإبداع والتقنية</p></div>
+        <div class="grid lg:grid-cols-2 gap-12 items-center">
+            <div class="fade-up"><div class="relative rounded-3xl overflow-hidden aspect-video bg-dark-700 glow-border"><img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=800&h=450&fit=crop" alt="تطوير الويب" class="w-full h-full object-cover opacity-80"><div class="absolute inset-0 bg-gradient-to-t from-dark-900/80 to-transparent"></div><div class="absolute bottom-6 right-6 left-6"><div class="text-2xl font-black">خبرة عميقة</div><div class="text-gray-300">في تطوير الويب والتصميم الرقمي</div></div></div></div>
+            <div class="space-y-6 fade-up">
+                <h3 class="text-2xl font-bold">رحلتنا في عالم التقنية</h3>
+                <p class="text-gray-400">انطلقنا من رؤية واضحة: تقديم حلول ويب عالمية المستوى. نجمع بين أحدث التقنيات والتصميم المبدع لبناء منتجات رقمية تتجاوز التوقعات.</p>
+                <p class="text-gray-400">فريقنا من المطورين والمصممين المحترفين يعمل بشغف لتحويل أفكار عملائنا إلى منتجات رقمية تُحقق أثراً حقيقياً.</p>
+                <div class="grid grid-cols-2 gap-4 pt-4">
+                    <div class="bg-dark-700/50 glow-border rounded-xl p-5 text-center card-hover"><div class="w-12 h-12 mx-auto rounded-xl bg-accent/10 flex items-center justify-center mb-3"><i class="fas fa-users text-accent"></i></div><div class="font-bold">فريق متميز</div><div class="text-gray-400 text-sm">كفاءات عالية</div></div>
+                    <div class="bg-dark-700/50 glow-border rounded-xl p-5 text-center card-hover"><div class="w-12 h-12 mx-auto rounded-xl bg-accent/10 flex items-center justify-center mb-3"><i class="fas fa-heart text-accent"></i></div><div class="font-bold">شغف بالعمل</div><div class="text-gray-400 text-sm">إتقان وتميّز</div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- الخدمات -->
+    <div id="homeServices" class="max-w-7xl mx-auto px-4 sm:px-6 py-20">
+        <div class="text-center mb-14 fade-up"><span class="text-accent font-bold text-sm tracking-wider">خدماتنا</span><h2 class="text-3xl sm:text-5xl font-black mt-3 mb-4">ماذا <span class="gradient-text">نقدم</span></h2><p class="text-gray-400 max-w-2xl mx-auto text-lg">حلول رقمية شاملة تغطي كل احتياجاتك التقنية</p></div>
+        <div class="space-y-8">
+            <div class="bg-dark-700/50 glow-border rounded-3xl p-6 sm:p-10 card-hover fade-up"><div class="grid lg:grid-cols-3 gap-8 items-center"><div class="lg:col-span-2"><div class="flex items-center gap-3 mb-4"><div class="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center"><i class="fas fa-globe text-accent text-lg"></i></div><h3 class="text-xl sm:text-2xl font-bold">تطوير المواقع</h3></div><p class="text-gray-400 mb-4">نبني مواقع ويب احترافية من الصفر باستخدام أحدث التقنيات. مواقع سريعة ومتجاوبة ومُحسّنة لمحركات البحث تعكس هوية علامتك التجارية.</p><div class="flex flex-wrap gap-2"><span class="px-3 py-1 rounded-lg bg-accent/10 text-accent text-xs font-bold">HTML5/CSS3</span><span class="px-3 py-1 rounded-lg bg-accent/10 text-accent text-xs font-bold">React</span><span class="px-3 py-1 rounded-lg bg-accent/10 text-accent text-xs font-bold">Vue.js</span><span class="px-3 py-1 rounded-lg bg-accent/10 text-accent text-xs font-bold">SEO</span></div></div><div class="hidden lg:block text-center"><div class="text-7xl font-black gradient-text"></div></div></div></div>
+            <div class="bg-dark-700/50 glow-border rounded-3xl p-6 sm:p-10 card-hover fade-up"><div class="grid lg:grid-cols-3 gap-8 items-center"><div class="lg:col-span-2"><div class="flex items-center gap-3 mb-4"><div class="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center"><i class="fas fa-shopping-cart text-accent text-lg"></i></div><h3 class="text-xl sm:text-2xl font-bold">متاجر إلكترونية</h3></div><p class="text-gray-400 mb-4">متاجر رقمية متكاملة مع أنظمة دفع آمنة وإدارة مخزون ذكية ولوحة تحكم سهلة وتحليلات مبيعات متقدمة.</p><div class="flex flex-wrap gap-2"><span class="px-3 py-1 rounded-lg bg-accent/10 text-accent text-xs font-bold">Shopify</span><span class="px-3 py-1 rounded-lg bg-accent/10 text-accent text-xs font-bold">WooCommerce</span><span class="px-3 py-1 rounded-lg bg-accent/10 text-accent text-xs font-bold">بوابات دفع</span></div></div><div class="hidden lg:block text-center"><div class="text-7xl font-black gradient-text"></div></div></div></div>
+            <div class="bg-dark-700/50 glow-border rounded-3xl p-6 sm:p-10 card-hover fade-up"><div class="grid lg:grid-cols-3 gap-8 items-center"><div class="lg:col-span-2"><div class="flex items-center gap-3 mb-4"><div class="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center"><i class="fas fa-paint-brush text-accent text-lg"></i></div><h3 class="text-xl sm:text-2xl font-bold">تصميم UI/UX</h3></div><p class="text-gray-400 mb-4">تصميم واجهات مستخدم جذابة وتجربة مستخدم سلسة مدروسة. نبدأ بالبحث والتحليل ثم نصمم نماذج أولية تضمن أفضل تفاعل ممكن.</p><div class="flex flex-wrap gap-2"><span class="px-3 py-1 rounded-lg bg-accent/10 text-accent text-xs font-bold">Figma</span><span class="px-3 py-1 rounded-lg bg-accent/10 text-accent text-xs font-bold">Prototype</span><span class="px-3 py-1 rounded-lg bg-accent/10 text-accent text-xs font-bold">بحث UX</span></div></div><div class="hidden lg:block text-center"><div class="text-7xl font-black gradient-text"></div></div></div></div>
+        </div>
+    </div>
+
+    <!-- أسئلة شائعة (في الرئيسية) -->
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 py-20">
+        <div class="text-center mb-14 fade-up"><span class="text-accent font-bold text-sm tracking-wider">أسئلة شائعة</span><h2 class="text-3xl sm:text-4xl font-black mt-3 mb-4">الأسئلة <span class="gradient-text">الأكثر تكراراً</span></h2></div>
+        <div class="space-y-3 fade-up" id="homeFaq"></div>
+    </div>
+
+    <!-- دعوة للعمل -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 pb-20">
+        <div class="relative rounded-3xl overflow-hidden p-8 sm:p-14 text-center fade-up" style="background:linear-gradient(135deg,rgba(0,229,160,0.08),rgba(0,184,212,0.05));border:1px solid rgba(0,229,160,0.15)">
+            <h2 class="text-2xl sm:text-4xl font-black mb-4">جاهز لبدء مشروعك الرقمي؟</h2>
+            <p class="text-gray-400 max-w-lg mx-auto mb-8">تواصل معنا اليوم واحصل على استشارة مجانية. فريقنا جاهز لتحويل فكرتك إلى واقع ناجح</p>
+            <button onclick="navigate('contact')" class="btn-primary px-10 py-4 rounded-2xl text-lg"><i class="fas fa-paper-plane ml-2"></i>تواصل معنا الآن</button>
+        </div>
+    </div>
+</section>
+
+<!-- ============ الخدمات ============ -->
+<section id="page-services" class="page-section">
+    <div class="pt-28 pb-20 max-w-7xl mx-auto px-4 sm:px-6">
+        <div class="text-center mb-14 fade-up"><span class="text-accent font-bold text-sm tracking-wider">خدماتنا</span><h2 class="text-3xl sm:text-5xl font-black mt-3 mb-4">ماذا <span class="gradient-text">نقدم</span></h2></div>
+        <div class="grid md:grid-cols-3 gap-8">
+            <div class="bg-dark-700/50 glow-border rounded-3xl overflow-hidden card-hover fade-up">
+                <img src="https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=600&h=300&fit=crop" alt="تطوير المواقع" class="w-full h-48 object-cover">
+                <div class="p-6"><div class="text-5xl font-black gradient-text mb-4"></div><h3 class="text-xl font-bold mb-3">تطوير المواقع</h3><p class="text-gray-400 text-sm mb-4">نبني مواقع ويب احترافية من الصفر. مواقع سريعة ومتجاوبة ومُحسّنة لمحركات البحث تعكس هوية علامتك التجارية.</p><div class="flex flex-wrap gap-2"><span class="px-3 py-1 rounded-lg bg-accent/10 text-accent text-xs font-bold">React</span><span class="px-3 py-1 rounded-lg bg-accent/10 text-accent text-xs font-bold">Vue.js</span><span class="px-3 py-1 rounded-lg bg-accent/10 text-accent text-xs font-bold">SEO</span></div></div>
+            </div>
+            <div class="bg-dark-700/50 glow-border rounded-3xl overflow-hidden card-hover fade-up">
+                <img src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=600&h=300&fit=crop" alt="متاجر إلكترونية" class="w-full h-48 object-cover">
+                <div class="p-6"><div class="text-5xl font-black gradient-text mb-4"></div><h3 class="text-xl font-bold mb-3">متاجر إلكترونية</h3><p class="text-gray-400 text-sm mb-4">متاجر رقمية متكاملة مع أنظمة دفع آمنة وإدارة مخزون ذكية وتحليلات مبيعات متقدمة.</p><div class="flex flex-wrap gap-2"><span class="px-3 py-1 rounded-lg bg-accent/10 text-accent text-xs font-bold">Shopify</span><span class="px-3 py-1 rounded-lg bg-accent/10 text-accent text-xs font-bold">WooCommerce</span><span class="px-3 py-1 rounded-lg bg-accent/10 text-accent text-xs font-bold">بوابات دفع</span></div></div>
+            </div>
+            <div class="bg-dark-700/50 glow-border rounded-3xl overflow-hidden card-hover fade-up">
+                <img src="https://images.unsplash.com/photo-1561070791-2526d30994b5?w=600&h=300&fit=crop" alt="تصميم UI/UX" class="w-full h-48 object-cover">
+                <div class="p-6"><div class="text-5xl font-black gradient-text mb-4"></div><h3 class="text-xl font-bold mb-3">تصميم UI/UX</h3><p class="text-gray-400 text-sm mb-4">تصميم واجهات مستخدم جذابة وتجربة مستخدم سلسة مدروسة تضمن أفضل تفاعل ممكن.</p><div class="flex flex-wrap gap-2"><span class="px-3 py-1 rounded-lg bg-accent/10 text-accent text-xs font-bold">Figma</span><span class="px-3 py-1 rounded-lg bg-accent/10 text-accent text-xs font-bold">Prototype</span><span class="px-3 py-1 rounded-lg bg-accent/10 text-accent text-xs font-bold">بحث UX</span></div></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============ أسئلة شائعة ============ -->
+<section id="page-faq" class="page-section">
+    <div class="pt-28 pb-20 max-w-3xl mx-auto px-4 sm:px-6">
+        <div class="text-center mb-14 fade-up"><span class="text-accent font-bold text-sm tracking-wider">أسئلة شائعة</span><h2 class="text-3xl sm:text-5xl font-black mt-3 mb-4">الأسئلة <span class="gradient-text">الأكثر شيوعاً</span></h2><p class="text-gray-400 text-lg">إجابات على الأسئلة التي تدور في ذهنك</p></div>
+        <div class="space-y-3 fade-up" id="pageFaq"></div>
+    </div>
+</section>
+
+<!-- ============ تواصل معنا ============ -->
+<section id="page-contact" class="page-section">
+    <div class="pt-28 pb-20 max-w-7xl mx-auto px-4 sm:px-6">
+        <div class="text-center mb-14 fade-up"><span class="text-accent font-bold text-sm tracking-wider">تواصل معنا</span><h2 class="text-3xl sm:text-5xl font-black mt-3 mb-4">نحب أن <span class="gradient-text">نسمع منك</span></h2></div>
+        <div class="flex justify-center gap-4 mb-10 fade-up">
+            <div class="contact-tab active-tab" onclick="switchTab('direct')" id="tabDirect"><i class="fas fa-phone-alt ml-2"></i>تواصل مباشر</div>
+            <div class="contact-tab" onclick="switchTab('form')" id="tabForm"><i class="fas fa-comment-dots ml-2"></i>أرسل رسالة</div>
+        </div>
+        <div id="directSection" class="fade-up">
+            <div class="max-w-2xl mx-auto space-y-5">
+                <a href="https://wa.me/962792948471" target="_blank" class="block bg-dark-700/50 glow-border rounded-2xl p-5 card-hover"><div class="flex items-center gap-5"><div class="w-14 h-14 rounded-2xl bg-green-500/10 flex items-center justify-center flex-shrink-0"><i class="fab fa-whatsapp text-green-400 text-2xl"></i></div><div class="flex-1"><div class="font-bold text-lg">واتساب</div><p class="text-gray-400 text-sm">أسرع طريقة للتواصل - رد خلال دقائق</p></div><span class="text-green-400 font-bold flex-shrink-0">0792948471</span></div></a>
+                <a href="tel:0792948471" class="block bg-dark-700/50 glow-border rounded-2xl p-5 card-hover"><div class="flex items-center gap-5"><div class="w-14 h-14 rounded-2xl bg-accent/10 flex items-center justify-center flex-shrink-0"><i class="fas fa-phone-alt text-accent text-2xl"></i></div><div class="flex-1"><div class="font-bold text-lg">اتصال هاتفي</div><p class="text-gray-400 text-sm">اتصل بنا مباشرة لمناقشة مشروعك</p></div><span class="text-accent font-bold flex-shrink-0">0792948471</span></div></a>
+                <a href="mailto:aboud.ayman2013@gmail.com" class="block bg-dark-700/50 glow-border rounded-2xl p-5 card-hover"><div class="flex items-center gap-5"><div class="w-14 h-14 rounded-2xl bg-cyan-400/10 flex items-center justify-center flex-shrink-0"><i class="fas fa-envelope text-cyan-400 text-2xl"></i></div><div class="flex-1"><div class="font-bold text-lg">البريد الإلكتروني</div><p class="text-gray-400 text-sm">أرسل تفاصيل مشروعك بالكامل</p></div><span class="text-cyan-400 font-bold text-xs flex-shrink-0">aboud.ayman2013@gmail.com</span></div></a>
+                <div class="bg-dark-700/50 glow-border rounded-2xl p-5"><div class="flex items-center gap-5"><div class="w-14 h-14 rounded-2xl bg-amber-400/10 flex items-center justify-center flex-shrink-0"><i class="fas fa-map-marker-alt text-amber-400 text-2xl"></i></div><div class="flex-1"><div class="font-bold text-lg">الموقع</div><p class="text-gray-400 text-sm">نسعد بزيارتك أو لقائك</p></div><span class="text-amber-400 font-bold flex-shrink-0">الأردن</span></div></div>
+            </div>
+        </div>
+        <div id="formSection" class="hidden fade-up">
+            <form id="contactForm" class="max-w-2xl mx-auto bg-dark-700/50 glow-border rounded-2xl p-6 sm:p-8 space-y-5">
+                <div><label class="block text-sm font-semibold mb-1.5 text-gray-300">الاسم الكامل</label><input type="text" id="cName" class="input-field w-full px-4 py-3 rounded-xl" placeholder="أدخل اسمك" required><p class="text-red-400 text-xs mt-1 hidden" id="cNameErr"></p></div>
+                <div><label class="block text-sm font-semibold mb-1.5 text-gray-300">البريد الإلكتروني</label><input type="email" id="cEmail" class="input-field w-full px-4 py-3 rounded-xl" placeholder="example@email.com" required><p class="text-red-400 text-xs mt-1 hidden" id="cEmailErr"></p></div>
+                <div><label class="block text-sm font-semibold mb-1.5 text-gray-300">الرسالة</label><textarea id="cMsg" class="input-field w-full px-4 py-3 rounded-xl resize-none" rows="5" placeholder="اكتب رسالتك..." required></textarea><p class="text-red-400 text-xs mt-1 hidden" id="cMsgErr"></p></div>
+                <button type="submit" id="cBtn" class="btn-primary w-full py-3.5 rounded-xl text-base"><i class="fas fa-paper-plane ml-2"></i>إرسال الرسالة</button>
+            </form>
+        </div>
+    </div>
+</section>
+
+<!-- الذيل -->
+<footer class="border-t border-white/5 bg-dark-950">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-12">
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-10">
+            <div><div class="flex items-center gap-2 mb-4"><div class="w-8 h-8 rounded-lg bg-gradient-to-br from-accent to-cyan-400 flex items-center justify-center"><i class="fas fa-code text-dark-900 text-xs font-black"></i></div><span class="text-lg font-black">TIK<span class="gradient-text">CODE</span></span></div><p class="text-gray-400 text-sm">بوابتك نحو العالم الرقمي</p></div>
+            <div><h4 class="font-bold mb-4 text-gray-200">روابط سريعة</h4><div class="space-y-2"><div class="text-gray-400 text-sm cursor-pointer hover:text-accent" onclick="navigate('home')">الرئيسية</div><div class="text-gray-400 text-sm cursor-pointer hover:text-accent" onclick="navigate('services')">خدماتنا</div><div class="text-gray-400 text-sm cursor-pointer hover:text-accent" onclick="navigate('faq')">أسئلة شائعة</div><div class="text-gray-400 text-sm cursor-pointer hover:text-accent" onclick="navigate('contact')">تواصل معنا</div></div></div>
+            <div><h4 class="font-bold mb-4 text-gray-200">تواصل معنا</h4><div class="space-y-2"><p class="text-gray-400 text-sm"><i class="fas fa-envelope ml-2 text-accent"></i>aboud.ayman2013@gmail.com</p><p class="text-gray-400 text-sm"><i class="fas fa-phone ml-2 text-accent"></i>0792948471</p><p class="text-gray-400 text-sm"><i class="fas fa-map-marker-alt ml-2 text-accent"></i>الأردن</p></div></div>
+        </div>
+        <div class="border-t border-white/5 pt-6 text-center"><p class="text-gray-500 text-sm">&copy; 2026 TIKCODE. جميع الحقوق محفوظة.</p></div>
+    </div>
+</footer>
+
+<script>
+// ========== Firebase ==========
+const fc={apiKey:"AIzaSyCbhjXmemRRJF8JlMqjCedPDq9Z4znjoos",authDomain:"tikcode-8ee13.firebaseapp.com",projectId:"tikcode-8ee13",storageBucket:"tikcode-8ee13.firebasestorage.app",messagingSenderId:"946344161132",appId:"1:946344161132:web:b0023ffdb197b94ed70d49",measurementId:"G-SSMBZ0Z2NK"};
+firebase.initializeApp(fc);const db=firebase.firestore();
+let currentRoute='home';
+
+// ========== إشعارات ==========
+function toast(m,t){t=t||'info';var c=document.getElementById('toastContainer'),d=document.createElement('div');d.className='toast toast-'+t;var ic={success:'fa-check-circle',error:'fa-times-circle',info:'fa-info-circle'};d.innerHTML='<i class="fas '+(ic[t]||ic.info)+' ml-2"></i>'+m;c.appendChild(d);setTimeout(function(){if(d.parentNode)d.remove()},3500)}
+
+// ========== ضوء الفأرة ==========
+document.addEventListener('mousemove',function(e){var g=document.getElementById('cursorGlow');if(g){g.style.left=e.clientX+'px';g.style.top=e.clientY+'px'}});
+if('ontouchstart' in window){var cg=document.getElementById('cursorGlow');if(cg)cg.style.display='none'}
+
+// ========== تبويبات التواصل ==========
+function switchTab(t){document.getElementById('tabDirect').classList.toggle('active-tab',t==='direct');document.getElementById('tabForm').classList.toggle('active-tab',t==='form');document.getElementById('directSection').classList.toggle('hidden',t!=='direct');document.getElementById('formSection').classList.toggle('hidden',t!=='form')}
+
+// ========== بيانات الأسئلة الشائعة ==========
+var faqData=[
+{q:'كم تستغرق مدة تصميم وتطوير الموقع؟',a:'تستغرق مدة التصميم والتطوير حسب نوع الموقع ما بين 2 إلى 3 أسابيع، وتعتمد المدة على حجم المشروع وتعقيده.'},
+{q:'ما هي تكلفة تصميم موقع إلكتروني؟',a:'تعتمد التكلفة على مدى تعقيد المشروع، حيث تبدأ من 40 د.أ للموقع البسيط وتصل إلى 800 د.أ للموقع المعقد. تواصل معنا للحصول على عرض سعر مخصص.'},
+{q:'هل الموقع يعمل على الجوال والتابلت؟',a:'نعم، جميع مواقعنا تعمل بكفاءة عالية على الجوال والتابلت وجميع الأجهزة بتصميم متجاوب يضمن أفضل تجربة مستخدم.'},
+{q:'هل توفرون خدمة الصيانة بعد التسليم؟',a:'نعم، نوفر خدمة صيانة مجانية بعد التسليم لمدة 14 يوماً تتضمن الإصلاحات والتحديثات اللازمة.'},
+{q:'كيف أبدأ مشروعي معكم؟',a:'يمكنك بدء مشروعك من خلال التواصل معنا عبر طرق التواصل الموجودة في أسفل الصفحة، وسنرد عليك في أقرب وقت.'},
+{q:'هل يمكنني تعديل محتوى الموقع بنفسي؟',a:'نعم، نوفر لوحة تحكم سهلة الاستخدام يمكنك من خلالها تعديل الموقع بنفسك بكل سهولة دون الحاجة لأي خبرة تقنية.'}
+];
+
+// ========== توليد HTML للأسئلة الشائعة ==========
+function buildFaqHtml(){return faqData.map(function(item,i){return '<div class="faq-item" onclick="toggleFaq(this)"><div class="flex items-center justify-between p-5 cursor-pointer"><span class="font-bold text-base">'+item.q+'</span><i class="fas fa-plus text-accent faq-icon"></i></div><div class="faq-answer"><div class="faq-answer-inner"><p class="text-gray-400 text-sm">'+item.a+'</p></div></div></div>'}).join('')}
+
+// ========== إدراج الأسئلة في الرئيسية وصفحة FAQ ==========
+document.getElementById('homeFaq').innerHTML=buildFaqHtml();
+document.getElementById('pageFaq').innerHTML=buildFaqHtml();
+
+// ========== فتح/إغلاق الأسئلة ==========
+function toggleFaq(el){
+    var wasOpen=el.classList.contains('open');
+    el.parentElement.querySelectorAll('.faq-item').forEach(function(item){item.classList.remove('open')});
+    if(!wasOpen) el.classList.add('open');
+}
+
+// ========== التنقل ==========
+function navigate(r){
+    var ss=document.querySelectorAll('.page-section');for(var i=0;i<ss.length;i++){ss[i].classList.remove('active');ss[i].style.opacity='0'}
+    var p=document.getElementById('page-'+r);if(p){p.classList.add('active');setTimeout(function(){p.style.opacity='1'},20);currentRoute=r;window.scrollTo({top:0,behavior:'smooth'});
+    var nl=document.querySelectorAll('.nav-link');for(var j=0;j<nl.length;j++)nl[j].classList.toggle('active-link',nl[j].getAttribute('data-route')===r);
+    setTimeout(obsEl,150)}
+}
+
+// ========== جوالة ==========
+function closeMob(){document.getElementById('mobMenu').classList.remove('open')}
+document.getElementById('mobBtn').onclick=function(){document.getElementById('mobMenu').classList.add('open')};
+document.getElementById('mobClose').onclick=closeMob;
+
+// ========== تواصل ==========
+document.getElementById('contactForm').addEventListener('submit',function(e){
+    e.preventDefault();hideErr('c');
+    var nm=document.getElementById('cName').value.trim(),em=document.getElementById('cEmail').value.trim(),ms=document.getElementById('cMsg').value.trim(),he=false;
+    if(!nm){showErr('cNameErr','الاسم مطلوب');he=true}if(!em){showErr('cEmailErr','البريد مطلوب');he=true}else if(!validE(em)){showErr('cEmailErr','بريد غير صالح');he=true}
+    if(!ms){showErr('cMsgErr','الرسالة مطلوبة');he=true}else if(ms.length<10){showErr('cMsgErr','10 أحرف على الأقل');he=true}if(he)return;
+    var b=document.getElementById('cBtn');b.disabled=true;b.innerHTML='<i class="fas fa-spinner fa-spin ml-2"></i>إرسال...';
+    db.collection('contacts').add({name:nm,email:em,message:ms,createdAt:firebase.firestore.FieldValue.serverTimestamp()})
+    .then(function(){toast('تم إرسال رسالتك بنجاح!','success');document.getElementById('contactForm').reset()}).catch(function(){toast('حدث خطأ','error')})
+    .finally(function(){b.disabled=false;b.innerHTML='<i class="fas fa-paper-plane ml-2"></i>إرسال الرسالة'})
+});
+
+// ========== مساعدات ==========
+function validE(e){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)}
+function showErr(id,m){var e=document.getElementById(id);if(e){e.textContent=m;e.classList.remove('hidden')}}
+function hideErr(p){var es=document.querySelectorAll('[id^="'+p+'"][id$="Err"]');for(var i=0;i<es.length;i++){es[i].classList.add('hidden');es[i].textContent=''}}
+
+// ========== تحريك ==========
+function obsEl(){var ob=new IntersectionObserver(function(en){for(var i=0;i<en.length;i++)if(en[i].isIntersecting)en[i].target.classList.add('visible')},{threshold:0.1,rootMargin:'0px 0px -40px 0px'});var es=document.querySelectorAll('.fade-up:not(.visible)');for(var i=0;i<es.length;i++)ob.observe(es[i])}
+
+// ========== جسيمات ==========
+function initCanvas(){
+    var cv=document.getElementById('heroCanvas');if(!cv)return;var cx=cv.getContext('2d'),ps=[],CN=40,LK=100,mx=-999,my=-999;
+    function rs(){cv.width=cv.offsetWidth;cv.height=cv.offsetHeight}rs();window.addEventListener('resize',rs);
+    cv.addEventListener('mousemove',function(e){var r=cv.getBoundingClientRect();mx=e.clientX-r.left;my=e.clientY-r.top});cv.addEventListener('mouseleave',function(){mx=-999;my=-999});
+    for(var i=0;i<CN;i++)ps.push({x:Math.random()*cv.offsetWidth,y:Math.random()*cv.offsetHeight,vx:(Math.random()-0.5)*0.25,vy:(Math.random()-0.5)*0.25,r:Math.random()*1.5+0.5});
+    function dr(){cx.clearRect(0,0,cv.offsetWidth,cv.offsetHeight);for(var i=0;i<ps.length;i++){var p=ps[i];p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>cv.offsetWidth)p.vx*=-1;if(p.y<0||p.y>cv.offsetHeight)p.vy*=-1;var dx=p.x-mx,dy=p.y-my,dt=Math.sqrt(dx*dx+dy*dy);if(dt<120){var f=(120-dt)/120*0.01;p.vx+=dx*f;p.vy+=dy*f}p.vx*=0.99;p.vy*=0.99;cx.beginPath();cx.arc(p.x,p.y,p.r,0,Math.PI*2);cx.fillStyle='rgba(0,229,160,0.35)';cx.fill()}
+    for(var i=0;i<ps.length;i++)for(var j=i+1;j<ps.length;j++){var dx=ps[i].x-ps[j].x,dy=ps[i].y-ps[j].y,d=Math.sqrt(dx*dx+dy*dy);if(d<LK){cx.beginPath();cx.moveTo(ps[i].x,ps[i].y);cx.lineTo(ps[j].x,ps[j].y);cx.strokeStyle='rgba(0,229,160,'+((1-d/LK)*0.08)+')';cx.lineWidth=0.4;cx.stroke()}}requestAnimationFrame(dr)}dr()
+}
+
+// ========== شريط ==========
+window.addEventListener('scroll',function(){var n=document.getElementById('navbar');if(window.scrollY>50){n.style.background='rgba(6,6,14,0.95)';n.style.borderBottomColor='rgba(0,229,160,0.1)'}else{n.style.background='rgba(6,6,14,0.85)';n.style.borderBottomColor='rgba(255,255,255,0.04)'}});
+
+// ========== تهيئة ==========
+(function(){var hp=document.getElementById('page-home');if(hp){hp.classList.add('active');hp.style.opacity='1'}currentRoute='home';
+var nl=document.querySelectorAll('.nav-link');for(var i=0;i<nl.length;i++)if(nl[i].getAttribute('data-route')==='home')nl[i].classList.add('active-link');
+initCanvas();obsEl()})();
+</script>
+</body>
+</html>
