@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    
-
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://tikcode.com">
     <link rel="canonical" href="https://tikcode.com">
@@ -24,12 +22,13 @@
     </script>
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
-        html{scroll-behavior:smooth}
+        /* تم تكبير الموقع بنسبة 5% إضافية (من 80% إلى 85%) */
+        html{scroll-behavior:smooth; font-size: 85%;}
         body{font-family:'Tajawal',sans-serif;background:#06060e;color:#e2e8f0;overflow-x:hidden;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
         body,p,span,div,li,a,button,input,textarea,label{line-height:2;letter-spacing:0.03em;word-spacing:0.08em}
         h1{line-height:1.3;letter-spacing:0}h2,h3,h4{line-height:1.5;letter-spacing:0.01em}
-        ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:#0c0c1d}::-webkit-scrollbar-thumb{background:#00e5a0;border-radius:3px}
-        #cursorGlow{position:fixed;width:250px;height:250px;border-radius:50%;background:radial-gradient(circle,rgba(0,229,160,0.28) 0%,rgba(0,229,160,0.1) 40%,transparent 70%);pointer-events:none;z-index:0;transform:translate(-50%,-50%);transition:opacity .15s ease}
+        ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:#0c0c1d}::-webkit-scrollbar-thumb{background:#00e5a0;border-radius:2.5px}
+        #cursorGlow{position:fixed;width:210px;height:210px;border-radius:50%;background:radial-gradient(circle,rgba(0,229,160,0.28) 0%,rgba(0,229,160,0.1) 40%,transparent 70%);pointer-events:none;z-index:0;transform:translate(-50%,-50%);transition:opacity .15s ease}
         .page-section{display:none;opacity:0;transition:opacity .35s ease}.page-section.active{display:block;animation:fadeIn .4s ease forwards}
         @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
         .gradient-text{background:linear-gradient(135deg,#00e5a0,#00b8d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
@@ -40,13 +39,14 @@
         .input-field{background:rgba(12,12,29,0.8);border:1px solid rgba(255,255,255,0.08);color:#e2e8f0;transition:all .3s ease;font-family:'Tajawal',sans-serif;line-height:1.8}.input-field:focus{outline:none;border-color:#00e5a0;box-shadow:0 0 0 3px rgba(0,229,160,0.1)}.input-field::placeholder{color:#4a5568}
         .nav-link{position:relative;transition:color .3s ease;cursor:pointer;text-decoration:none}.nav-link::after{content:'';position:absolute;bottom:-4px;right:0;width:0;height:2px;background:#00e5a0;transition:width .3s ease}.nav-link:hover::after,.nav-link.active-link::after{width:100%}.nav-link:hover,.nav-link.active-link{color:#00e5a0}
         .fade-up{opacity:0;transform:translateY(30px);transition:all .6s ease}.fade-up.visible{opacity:1;transform:translateY(0)}
-        .hero-canvas{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0}
+        .hero-video{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:0}
+        .hero-content{position:relative;z-index:2;transition:opacity 0.2s ease-out, transform 0.2s ease-out;will-change:opacity, transform}
         .toast-container{position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none}
-        .toast{padding:14px 24px;border-radius:12px;font-weight:600;font-size:14px;pointer-events:auto;animation:toastIn .4s ease,toastOut .4s ease 3s forwards;backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.1);max-width:420px;text-align:center;line-height:1.8}
+        .toast{padding:12px 20px;border-radius:10px;font-weight:600;font-size:12px;pointer-events:auto;animation:toastIn .4s ease,toastOut .4s ease 3s forwards;backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.1);max-width:350px;text-align:center;line-height:1.8}
         .toast-success{background:rgba(0,229,160,0.15);color:#00e5a0;border-color:rgba(0,229,160,0.3)}.toast-error{background:rgba(239,68,68,0.15);color:#f87171;border-color:rgba(239,68,68,0.3)}.toast-info{background:rgba(0,184,212,0.15);color:#00b8d4;border-color:rgba(0,184,212,0.3)}
         @keyframes toastIn{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}@keyframes toastOut{from{opacity:1}to{opacity:0;transform:translateY(-20px)}}
         .mobile-menu{transform:translateX(100%);transition:transform .3s ease;pointer-events:none}.mobile-menu.open{transform:translateX(0);pointer-events:auto}
-        .contact-tab{cursor:pointer;padding:10px 24px;border-radius:12px;font-weight:700;transition:all .3s ease;border:1px solid rgba(255,255,255,0.08);color:#94a3b8}
+        .contact-tab{cursor:pointer;padding:9px 20px;border-radius:10px;font-weight:700;transition:all .3s ease;border:1px solid rgba(255,255,255,0.08);color:#94a3b8}
         .contact-tab.active-tab{background:rgba(0,229,160,0.1);border-color:rgba(0,229,160,0.3);color:#00e5a0}
         .contact-tab:hover:not(.active-tab){border-color:rgba(255,255,255,0.15);color:#e2e8f0}
         .faq-item{border:1px solid rgba(255,255,255,0.06);border-radius:16px;overflow:hidden;transition:all .3s ease;background:rgba(18,18,42,0.4)}
@@ -55,7 +55,7 @@
         .faq-answer-inner{padding:0 24px 20px}
         .faq-icon{transition:transform .3s ease}.faq-item.open .faq-icon{transform:rotate(45deg)}
         .guarantee-badge{animation:pulse-glow 2s ease-in-out infinite}
-        @keyframes pulse-glow{0%,100%{box-shadow:0 0 20px rgba(0,229,160,0.15)}50%{box-shadow:0 0 40px rgba(0,229,160,0.3)}}
+        @keyframes pulse-glow{0%,100%{box-shadow:0 0 17px rgba(0,229,160,0.15)}50%{box-shadow:0 0 34px rgba(0,229,160,0.3)}}
         @media(prefers-reduced-motion:reduce){*{animation-duration:0.01ms!important;transition-duration:0.01ms!important}}
     </style>
 </head>
@@ -65,7 +65,7 @@
 <div id="toastContainer" class="toast-container"></div>
 
 <!-- شريط التنقل -->
-<nav id="navbar" class="fixed top-0 right-0 left-0 z-50 transition-all duration-300" style="background:rgba(6,6,14,0.85);backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,0.04)">
+<nav id="navbar" class="fixed top-0 right-0 left-0 z-50 transition-all duration-300" style="background:rgba(6,6,14,0.85);backdrop-filter:blur(13px);border-bottom:1px solid rgba(255,255,255,0.04)">
     <div class="max-w-7xl mx-auto px-4 sm:px-6">
         <div class="flex items-center justify-between h-16 sm:h-20">
             <div class="flex items-center gap-2 cursor-pointer" onclick="navigate('home')">
@@ -84,7 +84,7 @@
 </nav>
 
 <!-- القائمة الجوالة -->
-<div id="mobMenu" class="mobile-menu fixed top-0 left-0 right-0 bottom-0 z-[60] bg-dark-900" style="backdrop-filter:blur(20px)">
+<div id="mobMenu" class="mobile-menu fixed top-0 left-0 right-0 bottom-0 z-[60] bg-dark-900" style="backdrop-filter:blur(16px)">
     <div class="flex items-center justify-between p-4 border-b border-white/5"><span class="text-xl font-black">TIK<span class="gradient-text">CODE</span></span><button id="mobClose" class="text-gray-300 hover:text-white p-2 cursor-pointer"><i class="fas fa-times text-xl"></i></button></div>
     <div class="p-6 space-y-1">
         <div class="block py-3 px-4 rounded-xl text-gray-300 hover:text-accent hover:bg-accent/5 font-semibold cursor-pointer" onclick="navigate('home');closeMob()">الرئيسية</div>
@@ -98,11 +98,15 @@
 <section id="page-home" class="page-section">
     <!-- الهيرو -->
     <div class="relative min-h-screen flex items-center overflow-hidden">
-        <canvas id="heroCanvas" class="hero-canvas"></canvas>
-        <div class="absolute inset-0 bg-gradient-to-b from-transparent via-dark-900/50 to-dark-900 z-[1]"></div>
-        <div class="relative z-[2] max-w-7xl mx-auto px-4 sm:px-6 pt-24 pb-16 text-center">
+        <video autoplay muted loop playsinline class="hero-video">
+            <source src="Tik.mp4" type="video/mp4">
+            المتصفح لا يدعم تشغيل الفيديو.
+        </video>
+        <div class="absolute inset-0 bg-gradient-to-b from-dark-900/70 via-dark-900/50 to-dark-900 z-[1]"></div>
+        
+        <div id="heroContent" class="hero-content max-w-7xl mx-auto px-4 sm:px-6 pt-24 pb-16 text-center w-full">
             <h1 class="text-4xl sm:text-5xl md:text-7xl font-black mb-6 fade-up">بوابتك نحو<br><span class="gradient-text">العالم الرقمي</span></h1>
-            <p class="text-gray-400 text-lg sm:text-xl max-w-2xl mx-auto mb-10 fade-up">نحوّل أفكارك إلى واقع رقمي مذهل. نصمم ونطوّر مواقع وتطبيقات ويب عالية الأداء تُحقق أهدافك التجارية</p>
+            <p class="text-gray-200 text-lg sm:text-xl max-w-2xl mx-auto mb-10 fade-up">نحوّل أفكارك إلى واقع رقمي مذهل. نصمم ونطوّر مواقع وتطبيقات ويب عالية الأداء تُحقق أهدافك التجارية</p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center fade-up">
                 <button onclick="navigate('contact')" class="btn-primary px-8 py-4 rounded-2xl text-base sm:text-lg"><i class="fas fa-rocket ml-2"></i>ابدأ مشروعك</button>
                 <button onclick="document.getElementById('homeServices').scrollIntoView({behavior:'smooth'})" class="btn-outline px-8 py-4 rounded-2xl text-base sm:text-lg"><i class="fas fa-arrow-left ml-2"></i>عرض الخدمات</button>
@@ -307,23 +311,29 @@ function hideErr(p){var es=document.querySelectorAll('[id^="'+p+'"][id$="Err"]')
 // ========== تحريك ==========
 function obsEl(){var ob=new IntersectionObserver(function(en){for(var i=0;i<en.length;i++)if(en[i].isIntersecting)en[i].target.classList.add('visible')},{threshold:0.1,rootMargin:'0px 0px -40px 0px'});var es=document.querySelectorAll('.fade-up:not(.visible)');for(var i=0;i<es.length;i++)ob.observe(es[i])}
 
-// ========== جسيمات ==========
-function initCanvas(){
-    var cv=document.getElementById('heroCanvas');if(!cv)return;var cx=cv.getContext('2d'),ps=[],CN=40,LK=100,mx=-999,my=-999;
-    function rs(){cv.width=cv.offsetWidth;cv.height=cv.offsetHeight}rs();window.addEventListener('resize',rs);
-    cv.addEventListener('mousemove',function(e){var r=cv.getBoundingClientRect();mx=e.clientX-r.left;my=e.clientY-r.top});cv.addEventListener('mouseleave',function(){mx=-999;my=-999});
-    for(var i=0;i<CN;i++)ps.push({x:Math.random()*cv.offsetWidth,y:Math.random()*cv.offsetHeight,vx:(Math.random()-0.5)*0.25,vy:(Math.random()-0.5)*0.25,r:Math.random()*1.5+0.5});
-    function dr(){cx.clearRect(0,0,cv.offsetWidth,cv.offsetHeight);for(var i=0;i<ps.length;i++){var p=ps[i];p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>cv.offsetWidth)p.vx*=-1;if(p.y<0||p.y>cv.offsetHeight)p.vy*=-1;var dx=p.x-mx,dy=p.y-my,dt=Math.sqrt(dx*dx+dy*dy);if(dt<120){var f=(120-dt)/120*0.01;p.vx+=dx*f;p.vy+=dy*f}p.vx*=0.99;p.vy*=0.99;cx.beginPath();cx.arc(p.x,p.y,p.r,0,Math.PI*2);cx.fillStyle='rgba(0,229,160,0.35)';cx.fill()}
-    for(var i=0;i<ps.length;i++)for(var j=i+1;j<ps.length;j++){var dx=ps[i].x-ps[j].x,dy=ps[i].y-ps[j].y,d=Math.sqrt(dx*dx+dy*dy);if(d<LK){cx.beginPath();cx.moveTo(ps[i].x,ps[i].y);cx.lineTo(ps[j].x,ps[j].y);cx.strokeStyle='rgba(0,229,160,'+((1-d/LK)*0.08)+')';cx.lineWidth=0.4;cx.stroke()}}requestAnimationFrame(dr)}dr()
-}
-
-// ========== شريط ==========
-window.addEventListener('scroll',function(){var n=document.getElementById('navbar');if(window.scrollY>50){n.style.background='rgba(6,6,14,0.95)';n.style.borderBottomColor='rgba(0,229,160,0.1)'}else{n.style.background='rgba(6,6,14,0.85)';n.style.borderBottomColor='rgba(255,255,255,0.04)'}});
+// ========== شريط التنقل وإخفاء الهيرو ==========
+window.addEventListener('scroll',function(){
+    var n=document.getElementById('navbar');
+    if(window.scrollY>50){n.style.background='rgba(6,6,14,0.95)';n.style.borderBottomColor='rgba(0,229,160,0.1)'}else{n.style.background='rgba(6,6,14,0.85)';n.style.borderBottomColor='rgba(255,255,255,0.04)'}
+    
+    // تأثير اختفاء الكتابة بسلاسة
+    var heroContent = document.getElementById('heroContent');
+    if(heroContent && currentRoute === 'home'){
+        var scrollPos = window.scrollY;
+        var fadePoint = window.innerHeight * 0.6; // يبدأ الاختفاء التدريجي
+        var opacity = 1 - (scrollPos / fadePoint);
+        if(opacity < 0) opacity = 0;
+        if(opacity > 1) opacity = 1;
+        heroContent.style.opacity = opacity;
+        // تحريك بسيط للأعلى لزيادة الجمالية
+        heroContent.style.transform = 'translateY(' + (scrollPos * -0.3) + 'px)';
+    }
+});
 
 // ========== تهيئة ==========
 (function(){var hp=document.getElementById('page-home');if(hp){hp.classList.add('active');hp.style.opacity='1'}currentRoute='home';
 var nl=document.querySelectorAll('.nav-link');for(var i=0;i<nl.length;i++)if(nl[i].getAttribute('data-route')==='home')nl[i].classList.add('active-link');
-initCanvas();obsEl()})();
+obsEl()})();
 </script>
 </body>
 </html>
